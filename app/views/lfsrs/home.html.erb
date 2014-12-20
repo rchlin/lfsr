@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Standard LFSR</title>
+    <script src="snap.svg-min.js"></script>
+    <link rel="stylesheet" href="960_12_col.css">
+    <link rel="stylesheet" href="Standard_LFSR.css">
+    <script>
+        var svg;
+        var out_one;
+        var out_two;
+        var out_three;
+        var out_four;
+        window.onload = function(){
+            svg = Snap("#svg");
+            init_view();
+        }
+        function init_view(){
+            var g = svg.g().attr({
+                stroke: "black",
+                strokeWidth: 2,
+                fill: "none"
+            });
+            var p1 = svg.path("M0,0 L5,5 L0,10 L0,0").attr({
+                fill: "#000000"
+            });
+            var p_up = svg.path("M0,0 L5,5 L10,0 L0,0").attr({
+                fill: "#000"
+            });
+            var p_left = svg.path("M5,0 L5,10 L0,5 L5,0").attr({
+                fill: "#000"
+            });
+            var marker1 = p1.marker(0, 0, 10, 10, 5, 5 );
+            var marker_up = p_up.marker(0,0,10,10,5,5);
+            var marker_left = p_left.marker(0,0,10,10,0,5);
+            g.add(svg.path("M305,80 L25,80 L25,180"));
+            g.add(svg.line(25,180,75,180).attr({ markerEnd: marker1 }));
+            g.add(svg.rect(75,155,80,50));
+            g.add(svg.line(155,180,205,180).attr({ markerEnd: marker1 }));
+            g.add(svg.rect(205,155,80,50));
+            g.add(svg.line(285,180,335,180).attr({ markerEnd: marker1 }));
+            g.add(svg.rect(335,155,80,50));
+            g.add(svg.line(415,180,465,180).attr({ markerEnd: marker1 }));
+            g.add(svg.rect(465,155,80,50));
+            g.add(svg.line(310,180,310,85).attr({ markerEnd: marker1 }));
+            g.add(svg.path("M545,180 l50,0 l0,-100 L315,80").attr({ markerEnd: marker1 }));
+            g.add(svg.circle(310,80,5));
+            g.add(svg.path("M305,80 l10,0 m-5,-5 l0,10"));
+            out_one = svg.text(175,170,'0');
+            out_two = svg.text(305,202,'0');
+            out_three = svg.text(435,170,'0');
+            out_four = svg.text(565,170,'1');
+            init_pattern("0001");
+        }
+        function init_text(text, value){
+            text.attr({
+                text: value,
+                fontSize: "15pt"
+            });
+            text.data("value", value);
+        }
+        function load_text( pattern ){
+            init_text(out_one, pattern.charAt(0));
+            init_text(out_two, pattern.charAt(1));
+            init_text(out_three, pattern.charAt(2));
+            init_text(out_four, pattern.charAt(3));
+        }
+        function init_pattern( pattern ){
+            /*var uls = document.getElementsByTagName('ul');
+            var ul = uls.item(0);
+            var lists = ul.children;
+            lists[0].parentElement.removeChild(lists[0]);*/
+            load_text( pattern );
+            output();
+            window.event.preventDefault();
+        }
+        function generate_next(){
+            var xor_out = xor(out_four.data('value'), out_two.data('value'));
+            init_text(out_four, out_three.data('value'));
+            init_text(out_three, out_two.data('value'));
+            init_text(out_two, out_one.data('value'));
+            init_text(out_one, xor_out);
+            output();
+        }
+        function xor(s1, s2){
+            if(s1==s2)
+                return '0';
+            else
+                return '1';
+        }
+        function output(){
+            var pattern = out_one.data('value')+out_two.data('value')+out_three.data('value')+out_four.data('value');
+            var flag = false;
+            var uls = document.getElementsByTagName('ul');
+            var ul = uls.item(0);
+            var lists = ul.children;
+            var count = 0;
+            while( count<lists.length ){
+                var s = lists[count].innerHTML;
+                count++;
+                if( s==pattern ){
+                    flag = true;
+                    break;
+                }
+            }
+            if( flag ){
+                count = 0;
+                var length = lists.length
+                while( count<length ){
+                    lists[0].parentElement.removeChild(lists[0]);
+                    count++;
+                }
+            }
+            var new_li = document.createElement('li');
+            new_li.innerHTML = pattern;
+            ul.appendChild(new_li);
+        }
+        function trace_back(){
+            var uls = document.getElementsByTagName('ul');
+            var ul = uls.item(0);
+            var lists = ul.children;
+            var pattern = lists[lists.length-2].innerHTML;
+            load_text(pattern);
+            ul.removeChild(ul.lastChild);
+        }
+    </script>
+</head>
+<body>
+    <div class="container_12 clearfix">
+        <label for="view" class="grid_8">线性反馈移位寄存器：</label>
+        <label for="output" class="grid_4">输出状态：</label>
+        <div class="grid_8" id="view">
+            <svg id="svg" xmlns="http://www.w3.org/2000/svg" width="620" height="300">
+
+            </svg>
+        </div>
+        <div class="grid_4" id="output">
+            <ul>
+
+            </ul>
+        </div>
+        <div class="grid_12" id="control">
+            <form onsubmit="init_pattern(this.pattern.value)">
+                <label>初始状态：<input type="text" name="pattern"></label>
+            </form>
+            <button class="last" onclick="trace_back()"><</button>
+            <button class="next" onclick="generate_next()">></button>
+            <button class="play">||</button>
+        </div>
+    </div>
+</body>
+</html>

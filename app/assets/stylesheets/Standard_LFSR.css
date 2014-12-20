@@ -1,0 +1,14 @@
+#view{
+    border-style: solid;
+    margin-right: 0px;
+    height: 300px;
+}
+#output{
+    border-style: solid;
+    margin-right: 0px;
+    height: 300px;
+}
+#control{
+    margin: 5px auto;
+
+}
