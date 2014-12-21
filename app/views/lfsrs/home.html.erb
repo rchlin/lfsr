@@ -12,6 +12,8 @@
         var out_two;
         var out_three;
         var out_four;
+        var playing_flag = false;
+        var intervalId;
         window.onload = function(){
             svg = Snap("#svg");
             init_view();
@@ -124,6 +126,15 @@
             load_text(pattern);
             ul.removeChild(ul.lastChild);
         }
+        function play(){
+            if( playing_flag && intervalId ){
+                window.clearInterval( intervalId );
+                playing_flag = false;
+            }else{
+                intervalId = setInterval('generate_next()', 1000);
+                playing_flag = true;
+            }
+        }
     </script>
 </head>
 <body>
@@ -146,7 +157,7 @@
             </form>
             <button class="last" onclick="trace_back()"><</button>
             <button class="next" onclick="generate_next()">></button>
-            <button class="play">||</button>
+            <button class="play" onclick="play()">||</button>
         </div>
     </div>
 </body>

@@ -1,5 +1,7 @@
 Lfsr::Application.routes.draw do
   get "lfsrs/home"
+  
+  root :to => 'lfsrs#home'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
